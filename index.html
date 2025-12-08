@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walimatulurus: Anas & Ika</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;600&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gold': '#C5A059',
+                        'gold-dark': '#9A7B3E',
+                        'cream': '#F9F7F2',
+                        'deep-green': '#2C3E2E'
+                    },
+                    fontFamily: {
+                        'script': ['"Great Vibes"', 'cursive'],
+                        'header': ['"Cinzel"', 'serif'],
+                        'body': ['"Nunito Sans"', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F7F2;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5A059;
+            border-radius: 3px;
+        }
+
+        /* Flower Background Pattern */
+        .bg-pattern {
+            background-color: #F9F7F2;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C5A059' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Ornament Divider */
+        .divider-custom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .divider-custom::before, .divider-custom::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #C5A059;
+            margin: 0 10px;
+        }
+        .divider-icon {
+            color: #C5A059;
+            font-size: 1.2rem;
+        }
+        
+        #cover-page {
+            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+        }
+        
+        .hidden-content {
+            display: none;
+        }
+
+        /* Smooth Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-body overflow-x-hidden pb-20"> <!-- Added padding-bottom -->
+
+    <!-- Audio Player -->
+    <audio id="bg-music" loop>
+        <!-- Gantikan URL di bawah dengan link lagu 'Selamat Pengantin Baru' pilihan anda -->
+        <source src="https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/race1.ogg" type="audio/ogg"> 
+    </audio>
+
+    <!-- Music Toggle Button -->
+    <button id="music-btn" class="fixed bottom-24 right-5 z-50 bg-gold text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center hidden opacity-90 hover:opacity-100 transition" onclick="toggleMusic()">
+        <i class="fas fa-music animate-spin-slow text-sm"></i>
+    </button>
+
+    <!-- Bottom Navigation Bar -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] hidden transition-transform duration-500 transform translate-y-full">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <a href="#main-content" class="flex flex-col items-center text-gray-500 hover:text-gold active:text-gold transition w-full">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span class="text-[10px] uppercase tracking-wide font-semibold">Utama</span>
+            </a>
+            <a href="#lokasi" class="flex flex-col items-center text-gray-500 hover:text-gold active:text-gold transition w-full">
+                <i class="fas fa-map-marker-alt text-lg mb-1"></i>
+                <span class="text-[10px] uppercase tracking-wide font-semibold">Lokasi</span>
+            </a>
+            <a href="#rsvp-section" class="flex flex-col items-center text-gray-500 hover:text-gold active:text-gold transition w-full">
+                <i class="fas fa-calendar-check text-lg mb-1"></i>
+                <span class="text-[10px] uppercase tracking-wide font-semibold">RSVP</span>
+            </a>
+            <a href="#gift-section" class="flex flex-col items-center text-gray-500 hover:text-gold active:text-gold transition w-full">
+                <i class="fas fa-gift text-lg mb-1"></i>
+                <span class="text-[10px] uppercase tracking-wide font-semibold">Hadiah</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 1. Cover Page (Pintu Gerbang) -->
+    <div id="cover-page" class="fixed inset-0 z-50 bg-cover bg-center flex flex-col items-center justify-center text-center px-4" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1519225421980-715cb0202128?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');">
+        <div class="text-white animate-float">
+            <h3 class="text-xl tracking-widest uppercase mb-2">Walimatulurus</h3>
+            <h1 class="font-script text-6xl md:text-7xl mb-4 text-gold">Anas & Ika</h1>
+            <p class="mb-8 text-lg border-t border-b border-gold inline-block py-2 px-4">Ahad, 15 Februari 2026</p>
+            
+            <button onclick="openCard()" class="bg-gold hover:bg-white hover:text-gold text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg transform hover:scale-105 flex items-center gap-2 mx-auto">
+                <i class="fas fa-envelope-open-text"></i> Buka Undangan
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Main Content Container -->
+    <div id="main-content" class="max-w-md mx-auto bg-pattern min-h-screen shadow-2xl relative hidden-content">
+        
+        <!-- Header Image -->
+        <div class="h-64 bg-cover bg-center rounded-b-3xl shadow-md relative" style="background-image: url('https://images.unsplash.com/photo-1511285560982-1351cdeb9821?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');">
+            <div class="absolute inset-0 bg-black bg-opacity-30 rounded-b-3xl"></div>
+            <div class="absolute -bottom-10 left-0 right-0 flex justify-center">
+                <div class="w-24 h-24 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
+                   <span class="font-header text-3xl text-gold font-bold">A&I</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacer for profile circle -->
+        <div class="h-12"></div>
+
+        <!-- Content Padding -->
+        <div class="px-6 pb-10">
+
+            <!-- Intro / Salam -->
+            <div class="text-center mt-6 animate-fade-in-up">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Basmala.svg" alt="Bismillah" class="w-32 mx-auto mb-4 filter opacity-70">
+                <h2 class="font-header text-gold-dark text-xl font-bold mb-4">Assalamualaikum W.B.T</h2>
+                
+                <!-- Parents Names (Moved Up) -->
+                <div class="glass-card p-4 rounded-lg mb-4">
+                    
+                    <p class="font-bold text-gray-800">Hajah Marmi Binti Md Pandi</p>
+                    <p class="text-sm italic">(Balu Allahyarham Haji Jalani Bin Simun)</p>    
+                    </p>
+                </div>
+
+                <p class="text-sm text-gray-600 leading-relaxed mb-6">
+                    Dengan penuh kesyukuran ke hadrat Ilahi, kami mempersilakan Dato'/Datin/Tuan/Puan/Encik/Cik sekeluarga ke majlis perkahwinan putera puteri kami:
+                </p>
+            </div>
+
+            <div class="divider-custom">
+                <i class="fas fa-heart divider-icon"></i>
+            </div>
+
+            <!-- Couple Names -->
+            <div class="text-center">
+                <h1 class="font-script text-5xl text-gold mb-2">Anas</h1>
+                <p class="text-sm tracking-widest text-gray-700 uppercase mb-2 font-semibold">Mohd Nasriq Bin Jalani</p>
+                <div class="text-2xl text-gold-dark my-2 font-script">&</div>
+                <h1 class="font-script text-5xl text-gold mb-2">Ika</h1>
+                <p class="text-sm tracking-widest text-gray-700 uppercase mb-2 font-semibold">Nur Atiqah Binti Ali Juaher</p>
+            </div>
+
+            <div class="divider-custom">
+                <i class="fas fa-leaf divider-icon"></i>
+            </div>
+
+            <!-- Date & Verse -->
+            <div class="text-center bg-white p-6 rounded-xl shadow-sm border border-gold border-opacity-20 mb-8">
+                <p class="text-gray-600 italic text-sm mb-4">
+                    "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan-pasangan dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berfikir"
+                    <br><span class="text-xs font-bold not-italic mt-1 block">(Surah Ar-Rum: 21)</span>
+                </p>
+                
+                <h3 class="font-header text-2xl text-deep-green mt-6">Ahad</h3>
+                <div class="flex items-center justify-center gap-4 my-2">
+                    <span class="block h-px w-8 bg-gold"></span>
+                    <span class="text-4xl font-bold text-gold">15</span>
+                    <span class="block h-px w-8 bg-gold"></span>
+                </div>
+                <h3 class="font-header text-xl text-deep-green uppercase">Februari 2026</h3>
+                <p class="text-sm text-gray-500 mt-1">27 Syaaban 1447H</p>
+            </div>
+
+            <!-- Itinerary Details -->
+            <div class="text-center mb-8">
+                <h2 class="font-header text-xl text-gold-dark mb-4 border-b-2 border-gold inline-block pb-1">Atur Cara Majlis</h2>
+                <ul class="space-y-4 text-sm text-gray-700">
+                    <li class="flex flex-col items-center bg-white p-3 rounded-lg shadow-sm">
+                        <i class="fas fa-clock text-gold text-lg mb-1"></i>
+                        <span class="font-bold">10.00 Pagi - 3.00 Petang</span>
+                        <span>Jamuan Makan</span>
+                    </li>
+                    <li class="flex flex-col items-center bg-white p-3 rounded-lg shadow-sm">
+                        <i class="fas fa-crown text-gold text-lg mb-1"></i>
+                        <span class="font-bold">12:30 PM</span>
+                        <span>Ketibaan Pengantin</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Venue -->
+            <div id="lokasi" class="text-center mb-8 scroll-mt-20">
+                <h2 class="font-header text-xl text-gold-dark mb-4">Lokasi Majlis</h2>
+                <p class="font-bold text-gray-800">Rancangan Tanah Belia 1</p>
+                <p class="text-sm text-gray-600 px-8">Sungai Panjang, 45300 Sungai Besar, Selangor.</p>
+                
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <a href="https://www.google.com/maps/search/?api=1&query=3.719670,101.161216" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2 border border-gray-300 transition">
+                        <i class="fab fa-google text-red-500"></i> Google Maps
+                    </a>
+                    <a href="https://waze.com/ul?ll=3.719670,101.161216&navigate=yes" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2 border border-gray-300 transition">
+                        <i class="fab fa-waze text-blue-500"></i> Waze
+                    </a>
+                </div>
+                
+                <!-- Updated Contact Buttons -->
+                <div class="mt-4 space-y-2">
+                    <p class="text-sm font-bold text-gray-700 mb-2 border-b border-gray-200 inline-block pb-1">Hubungi Waris</p>
+                    <a href="https://wa.me/60136332420" target="_blank" class="block bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fab fa-whatsapp"></i> Nana (Kakak)
+                    </a>
+                    <a href="https://wa.me/60194201436" target="_blank" class="block bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fab fa-whatsapp"></i> Zaza (Kakak)
+                    </a>
+                    <a href="https://wa.me/60136710228" target="_blank" class="block bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fab fa-whatsapp"></i> Zaman (Abang)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="bg-deep-green text-cream rounded-xl p-6 text-center mb-10 shadow-lg">
+                <h3 class="font-header mb-4 text-gold">Menanti Hari Bahagia</h3>
+                <div id="countdown" class="grid grid-cols-4 gap-2">
+                    <div class="bg-white bg-opacity-10 rounded p-2">
+                        <span id="days" class="block text-2xl font-bold">00</span>
+                        <span class="text-xs uppercase">Hari</span>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded p-2">
+                        <span id="hours" class="block text-2xl font-bold">00</span>
+                        <span class="text-xs uppercase">Jam</span>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded p-2">
+                        <span id="minutes" class="block text-2xl font-bold">00</span>
+                        <span class="text-xs uppercase">Minit</span>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded p-2">
+                        <span id="seconds" class="block text-2xl font-bold">00</span>
+                        <span class="text-xs uppercase">Saat</span>
+                    </div>
+                </div>
+                
+                <!-- Add to Calendar -->
+                <a href="#" class="inline-block mt-4 text-xs underline text-gold hover:text-white transition">Simpan Tarikh (Google Calendar)</a>
+            </div>
+
+            <!-- RSVP Form -->
+            <div id="rsvp-section" class="glass-card rounded-xl p-6 mb-8 border-t-4 border-gold scroll-mt-20">
+                <h2 class="font-header text-xl text-center text-gold-dark mb-4">Pengesahan Kehadiran (RSVP)</h2>
+                <form id="rsvpForm" onsubmit="submitRSVP(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama</label>
+                        <input id="rsvp-name" type="text" required class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold" placeholder="Nama Penuh Anda">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kehadiran</label>
+                        <select id="rsvp-attendance" required class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                            <option value="Hadir">Hadir</option>
+                            <option value="Tidak Hadir">Tidak Hadir</option>
+                            <option value="Mungkin">Mungkin</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Jumlah Pax (Termasuk anda)</label>
+                        <select id="rsvp-pax" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                            <option value="1">1 Orang</option>
+                            <option value="2">2 Orang</option>
+                            <option value="3">3 Orang</option>
+                            <option value="4">4 Orang</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Ucapan</label>
+                        <textarea id="rsvp-message" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold" rows="3" placeholder="Sampaikan ucapan tahniah..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gold hover:bg-gold-dark text-white font-bold py-2 rounded shadow transition duration-200">
+                        Hantar RSVP
+                    </button>
+                </form>
+            </div>
+
+            <!-- Money Gift / Salam Kaut -->
+            <div id="gift-section" class="glass-card rounded-xl p-6 mb-8 border-t-4 border-gold text-center scroll-mt-20">
+                <h2 class="font-header text-xl text-gold-dark mb-4">Money Gift</h2>
+                <p class="text-sm text-gray-600 mb-4">
+                    Tanpa mengurangi rasa hormat, bagi tetamu yang ingin memberikan tanda kasih, boleh disalurkan melalui:
+                </p>
+                
+                <!-- Bank Details Box -->
+                <div class="bg-white bg-opacity-60 p-5 rounded-lg border border-gray-200 shadow-inner">
+                    <!-- QR Code (Optional) -->
+                    <div class="mb-4 flex justify-center">
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                            <i class="fas fa-qrcode text-6xl text-gray-300"></i>
+                            <p class="text-[10px] text-gray-400 mt-1">QR DuitNow</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="font-bold text-gray-800 text-lg">MAYBANK</p>
+                        <p class="text-sm text-gray-500 uppercase">Mohd Nasriq Bin Jalani</p>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2 bg-gray-100 rounded-lg p-2 max-w-xs mx-auto border border-gray-200">
+                        <span class="font-mono text-lg font-bold text-gray-700 tracking-wider">162012345678</span>
+                        <button onclick="copyToClipboard('162012345678')" class="text-gold hover:text-gold-dark p-2 transition active:scale-95" title="Salin No. Akaun">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">Tekan ikon untuk salin</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center text-xs text-gray-500 mt-10 pb-6">
+                <p class="font-script text-2xl text-gold mb-2">Terima Kasih</p>
+                <p>Kerana sudi memeriahkan majlis kami.</p>
+                <div class="mt-4 opacity-50">
+                    &copy; 2026 Anas & Ika Wedding
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RSVP Success Modal -->
+    <div id="modal-success" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-xs text-center shadow-xl animate-fade-in-up m-4">
+            <div class="w-12 h-12 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-xl"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Terima Kasih!</h3>
+            <p class="text-sm text-gray-600 mb-4">Kehadiran anda telah direkodkan. Jumpa anda di sana!</p>
+            <button onclick="document.getElementById('modal-success').classList.add('hidden')" class="bg-gray-800 text-white px-4 py-2 rounded text-sm w-full">Tutup</button>
+        </div>
+    </div>
+
+    <script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+/* ---------------------------------------------------------
+   1. UI FUNCTIONS (SAFE TO LOAD BEFORE FIREBASE)
+--------------------------------------------------------- */
+
+// Helpers
+const bgMusic = document.getElementById('bg-music');
+const musicBtn = document.getElementById('music-btn');
+const bottomNav = document.getElementById('bottom-nav');
+let isPlaying = false;
+
+// Open Card
+window.openCard = function () {
+    const cover = document.getElementById('cover-page');
+    cover.style.transform = 'translateY(-100%)';
+
+    const mainContent = document.getElementById('main-content');
+    mainContent.classList.remove('hidden-content');
+
+    if (bottomNav) {
+        bottomNav.classList.remove('hidden');
+        setTimeout(() => bottomNav.classList.remove('translate-y-full'), 100);
+    }
+
+    if (bgMusic) {
+        bgMusic.play().then(() => {
+            isPlaying = true;
+            musicBtn?.classList.remove('hidden');
+        }).catch(() => {
+            musicBtn?.classList.remove('hidden');
+        });
+    }
+
+    setTimeout(() => cover.style.display = 'none', 800);
+};
+
+// Music toggle
+window.toggleMusic = function () {
+    if (isPlaying) {
+        bgMusic.pause();
+        musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+        musicBtn.classList.remove('animate-spin-slow');
+    } else {
+        bgMusic.play();
+        musicBtn.innerHTML = '<i class="fas fa-compact-disc"></i>';
+        musicBtn.classList.add('animate-spin-slow');
+    }
+    isPlaying = !isPlaying;
+};
+
+// Copy to clipboard
+window.copyToClipboard = function (text) {
+    const temp = document.createElement("input");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("Nombor akaun berjaya disalin: " + text);
+};
+
+// Countdown
+const weddingDate = new Date("Feb 15, 2026 10:00:00").getTime();
+const timer = setInterval(() => {
+    const now = Date.now();
+    const diff = weddingDate - now;
+
+    if (diff < 0) {
+        clearInterval(timer);
+        document.getElementById("countdown").innerHTML =
+            "<div class='col-span-4 text-xl font-bold'>Majlis Sedang Berlangsung!</div>";
+        return;
+    }
+
+    document.getElementById("days").innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    document.getElementById("hours").innerText = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+    document.getElementById("minutes").innerText = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+    document.getElementById("seconds").innerText = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+}, 1000);
+
+/* ---------------------------------------------------------
+   2. FIREBASE INIT (SAFE)
+--------------------------------------------------------- */
+let db, auth;
+const appId = "kadkahwin-f1229"; // boleh tukar bila perlu
+
+try {
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKITn1VIQW-0a_R8RA-6H_PYY_7YdYWOA",
+        authDomain: "kadkahwin-f1229.firebaseapp.com",
+        projectId: "kadkahwin-f1229",
+        storageBucket: "kadkahwin-f1229.appspot.com",
+        messagingSenderId: "59139070924",
+        appId: "1:59139070924:web:14dfe31efea8c91f17db69",
+        measurementId: "G-L2HX23FCHJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // Auto authenticate
+    async function authenticateUser() {
+        if (auth.currentUser) return;
+        try {
+            await signInAnonymously(auth);
+        } catch (err) {
+            console.error("Auth failed:", err);
+        }
+    }
+    authenticateUser();
+
+} catch (err) {
+    console.error("Firebase initialization error:", err);
+}
+
+/* ---------------------------------------------------------
+   3. SUBMIT RSVP (FIXED PATH)
+--------------------------------------------------------- */
+
+window.submitRSVP = async function (e) {
+    e.preventDefault();
+
+    if (!db || !auth) {
+        alert("Maaf, sistem RSVP tidak dapat dihubungi.");
+        return;
+    }
+
+    const btn = e.target.querySelector("button[type='submit']");
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghantar...';
+    btn.disabled = true;
+
+    const name = document.getElementById('rsvp-name').value;
+    const attendance = document.getElementById('rsvp-attendance').value;
+    const pax = document.getElementById('rsvp-pax').value;
+    const message = document.getElementById('rsvp-message').value;
+
+    try {
+        if (!auth.currentUser) await signInAnonymously(auth);
+
+        await addDoc(
+            collection(db, "apps", appId, "rsvps"),   // *** FIXED FIRESTORE PATH ***
+            {
+                name,
+                attendance,
+                pax: parseInt(pax),
+                message,
+                timestamp: serverTimestamp()
+            }
+        );
+
+        document.getElementById('modal-success').classList.remove('hidden');
+        e.target.reset();
+
+    } catch (err) {
+        console.error("RSVP failed:", err);
+        alert("Maaf, terdapat masalah teknikal. Cuba lagi sebentar lagi.");
+    }
+
+    btn.innerHTML = original;
+    btn.disabled = false;
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard RSVP</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<div class="max-w-4xl mx-auto mt-10">
+    <h1 class="text-3xl font-bold text-center text-gold mb-6">Senarai RSVP</h1>
+
+    <div class="bg-white rounded shadow p-4">
+        <table class="min-w-full table-auto border border-gray-200">
+          <thead class="bg-gray-200">
+            <tr>
+                <th class="px-4 py-2 border text-black font-bold">Nama</th>
+                <th class="px-4 py-2 border text-black font-bold">Kehadiran</th>
+                <th class="px-4 py-2 border text-black font-bold">Pax</th>
+                <th class="px-4 py-2 border text-black font-bold">Ucapan</th>
+                <th class="px-4 py-2 border text-black font-bold">Masa</th>
+            </tr>
+        </thead>
+
+            <tbody id="rsvp-list">
+                <tr>
+                    <td colspan="5" class="text-center py-4">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getFirestore, collection, query, orderBy, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyBKITn1VIQW-0a_R8RA-6H_PYY_7YdYWOA",
+    authDomain: "kadkahwin-f1229.firebaseapp.com",
+    projectId: "kadkahwin-f1229",
+    storageBucket: "kadkahwin-f1229.appspot.com",
+    messagingSenderId: "59139070924",
+    appId: "1:59139070924:web:14dfe31efea8c91f17db69"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const appId = "kadkahwin-f1229";
+
+// Reference RSVP collection
+const rsvpRef = collection(db, "apps", appId, "rsvps");
+
+// Query ordered by timestamp
+const rsvpQuery = query(rsvpRef, orderBy("timestamp", "desc"));
+
+const tbody = document.getElementById("rsvp-list");
+
+// Listen to changes in real-time
+onSnapshot(rsvpQuery, (snapshot) => {
+    tbody.innerHTML = ""; // clear table
+    if(snapshot.empty){
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Tiada RSVP lagi.</td></tr>`;
+        return;
+    }
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        const ts = data.timestamp?.toDate ? data.timestamp.toDate() : null;
+        const row = document.createElement("tr");
+        row.classList.add("border-b");
+        row.innerHTML = `
+            <td class="px-4 py-2 border">${data.name || "-"}</td>
+            <td class="px-4 py-2 border">${data.attendance || "-"}</td>
+            <td class="px-4 py-2 border">${data.pax || 1}</td>
+            <td class="px-4 py-2 border">${data.message || "-"}</td>
+            <td class="px-4 py-2 border">${ts ? ts.toLocaleString() : "-"}</td>
+        `;
+        tbody.appendChild(row);
+    });
+});
+</script>
+
+</body>
+</html>

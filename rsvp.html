@@ -1,43 +1,60 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard RSVP</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard RSVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans p-6">
 
-<div class="max-w-4xl mx-auto mt-10">
-    <h1 class="text-3xl font-bold text-center text-gold mb-6">Senarai RSVP</h1>
+    <h1 class="text-2xl font-bold mb-6">Dashboard RSVP</h1>
 
-    <div class="bg-white rounded shadow p-4">
-        <table class="min-w-full table-auto border border-gray-200">
-          <thead class="bg-gray-200">
-            <tr>
-                <th class="px-4 py-2 border text-black font-bold">Nama</th>
-                <th class="px-4 py-2 border text-black font-bold">Kehadiran</th>
-                <th class="px-4 py-2 border text-black font-bold">Pax</th>
-                <th class="px-4 py-2 border text-black font-bold">Ucapan</th>
-                <th class="px-4 py-2 border text-black font-bold">Masa</th>
-            </tr>
-        </thead>
+    <!-- Cards -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-6 rounded-lg shadow text-center">
+            <h2 class="text-lg font-bold">Jumlah Hadir</h2>
+            <p id="jumlahHadir" class="text-3xl font-semibold mt-2">0</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow text-center">
+            <h2 class="text-lg font-bold">Jumlah Tidak Hadir</h2>
+            <p id="jumlahTidakHadir" class="text-3xl font-semibold mt-2">0</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow text-center">
+            <h2 class="text-lg font-bold">Jumlah Pax Hadir</h2>
+            <p id="jumlahPax" class="text-3xl font-semibold mt-2">0</p>
+        </div>
+    </div>
 
-            <tbody id="rsvp-list">
-                <tr>
-                    <td colspan="5" class="text-center py-4">Loading...</td>
+    <!-- Table -->
+    <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+        <table class="min-w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="text-left px-4 py-2 font-bold text-black">Nama</th>
+                    <th class="text-left px-4 py-2 font-bold text-black">Status</th>
+                    <th class="text-left px-4 py-2 font-bold text-black">Pax</th>
                 </tr>
+            </thead>
+            <tbody id="rsvpTable" class="divide-y divide-gray-200">
+                <!-- Data akan dimasukkan di sini -->
             </tbody>
         </table>
     </div>
-</div>
 
-<script type="module">
+    <!-- Pagination -->
+    <div class="flex justify-center mt-4 space-x-2">
+        <button id="prevPage" class="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"><i class="fas fa-chevron-left"></i></button>
+        <span id="pageInfo" class="px-2 py-1"></span>
+        <button id="nextPage" class="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getFirestore, collection, query, orderBy, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyBKITn1VIQW-0a_R8RA-6H_PYY_7YdYWOA",
     authDomain: "kadkahwin-f1229.firebaseapp.com",
@@ -49,39 +66,86 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const appId = "kadkahwin-f1229";
 
-// Reference RSVP collection
-const rsvpRef = collection(db, "apps", appId, "rsvps");
+let hadirData = [];
+let tidakHadirData = [];
+let currentPage = 1;
+const pageSize = 5;
 
-// Query ordered by timestamp
-const rsvpQuery = query(rsvpRef, orderBy("timestamp", "desc"));
+async function loadRSVP() {
+    hadirData = [];
+    tidakHadirData = [];
 
-const tbody = document.getElementById("rsvp-list");
+    let countPax = 0;
 
-// Listen to changes in real-time
-onSnapshot(rsvpQuery, (snapshot) => {
-    tbody.innerHTML = ""; // clear table
-    if(snapshot.empty){
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Tiada RSVP lagi.</td></tr>`;
-        return;
-    }
-    snapshot.forEach(doc => {
+    const snap = await getDocs(collection(db, "apps", "kadkahwin-f1229", "rsvps"));
+    snap.forEach(doc => {
         const data = doc.data();
-        const ts = data.timestamp?.toDate ? data.timestamp.toDate() : null;
-        const row = document.createElement("tr");
-        row.classList.add("border-b");
-        row.innerHTML = `
-            <td class="px-4 py-2 border">${data.name || "-"}</td>
-            <td class="px-4 py-2 border">${data.attendance || "-"}</td>
-            <td class="px-4 py-2 border">${data.pax || 1}</td>
-            <td class="px-4 py-2 border">${data.message || "-"}</td>
-            <td class="px-4 py-2 border">${ts ? ts.toLocaleString() : "-"}</td>
-        `;
-        tbody.appendChild(row);
+        const nama = data.name || "Tanpa Nama";
+        const status = data.attendance || "-";
+        const pax = data.pax || 1;
+
+        if (status === "Hadir") {
+            hadirData.push({nama, status, pax});
+            countPax += pax;
+        } else {
+            tidakHadirData.push({nama, status, pax});
+        }
     });
+
+    // Papar jumlah
+    document.getElementById("jumlahHadir").innerText = hadirData.length;
+    document.getElementById("jumlahTidakHadir").innerText = tidakHadirData.length;
+    document.getElementById("jumlahPax").innerText = countPax;
+
+    renderPage();
+}
+
+function renderPage() {
+    const tbody = document.getElementById("rsvpTable");
+    tbody.innerHTML = "";
+
+    const allData = [...hadirData, ...tidakHadirData];
+    const totalPages = Math.ceil(allData.length / pageSize);
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const pageData = allData.slice(start, end);
+
+    pageData.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="px-4 py-2">${item.nama}</td>
+            <td class="px-4 py-2">${item.status}</td>
+            <td class="px-4 py-2">${item.pax}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById("pageInfo").innerText = `Halaman ${currentPage} / ${totalPages}`;
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+}
+
+// Pagination events
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderPage();
+    }
 });
-</script>
+document.getElementById("nextPage").addEventListener("click", () => {
+    const totalPages = Math.ceil((hadirData.length + tidakHadirData.length) / pageSize);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderPage();
+    }
+});
+
+// Load data on start
+loadRSVP();
+
+    </script>
 
 </body>
 </html>
